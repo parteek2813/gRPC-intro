@@ -1,15 +1,15 @@
 service TodoService {
     rpc CreateTodo (Todo) returns (Todo) {}
     rpc GetTodo (TodoRequest) returns (TodoList) {}
-    rpc listTodos (Empty) returns (Todo) {}
+    rpc listTodos (Empty) returns (TodoList) {}
 }
 
-message Empty {}
+// message Empty {}
 
 message Todo {
-    string id =1;
+    optional string id = 1;
     string title = 2;
-    optional string content = 3;
+    string content = 3;
 }
 
 message TodoList {

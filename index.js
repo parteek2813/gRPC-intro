@@ -1,5 +1,4 @@
 const grpc = require("@grpc/grpc-js");
-const todosProto = grpc.load("load.proto");
 const protoLoader = require("@grpc/proto-loader");
 
 const packageDefinition = protoLoader.loadSync("./todo.proto", {
