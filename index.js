@@ -1,5 +1,17 @@
 const grpc = require("@grpc/grpc-js");
 const todosProto = grpc.load("load.proto");
+const protoLoader = require("@grpc/proto-loader");
+
+const packageDefinition = protoLoader.loadSync("./todo.proto", {
+  keepCase: true,
+  longs: String,
+  enums: String,
+  defaults: true,
+  oneofs: true,
+});
+
+const protoDescriptor = grpc.loadPackageDefinition(packageDefinition);
+var todo = protoDescriptor.TodoService;
 
 const server = new grpc.Server();
 
@@ -16,7 +28,7 @@ const todos = [
   },
 ];
 
-server.addService(todosProto.TodoService.service, {
+server.addService(todo.TodoService.service, {
   listTodos: (call, callback) => {
     callback(null, todos);
   },
@@ -26,10 +38,22 @@ server.addService(todosProto.TodoService.service, {
     callback(null, incomingNewTodo);
   },
   getTodo: (call, callback) => {
-    let incomingId = call.request;
+    let incomingTodoRequest = call.request;
+    let todoId = incomingTodoRequest.id;
+    const response = todos.filter((todo) => todo.id === todoId);
+
+    if (response.length > 0) {
+      callback(null, response);
+    } else {
+    }
   },
 });
 
-server.bind("127.0.0.1:50051", grpc.ServerCredentials.createInsecure());
-console.log("server started");
-server.start();
+server.bindAsync(
+  "127.0.0.1:50051",
+  grpc.ServerCredentials.createInsecure(),
+  () => {
+    console.log("server started");
+    server.start();
+  }
+);
